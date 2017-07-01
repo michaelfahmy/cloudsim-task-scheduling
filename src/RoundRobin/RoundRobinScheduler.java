@@ -64,7 +64,7 @@ public class RoundRobinScheduler {
         Cloudlet[] cloudlet = new Cloudlet[cloudlets];
 
         for (int i = 0; i < cloudlets; i++) {
-            int dcId = (int) (Math.random() * 5);
+            int dcId = (int) (Math.random() * Constants.NO_OF_DATA_CENTERS);
             long length = (long) (1e3 * (commMatrix[i][dcId] + execMatrix[i][dcId]));
             cloudlet[i] = new Cloudlet(idShift + i, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
             // setting the owner of these Cloudlets
