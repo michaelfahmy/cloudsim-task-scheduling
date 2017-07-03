@@ -1,4 +1,5 @@
-package RoundRobin;
+package SJF;
+
 
 import org.cloudbus.cloudsim.*;
 import org.cloudbus.cloudsim.core.CloudSim;
@@ -15,8 +16,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-
-public class RoundRobinScheduler {
+public class SJF_Scheduler {
 
     private static List<Cloudlet> cloudletList;
     private static List<Vm> vmList;
@@ -72,7 +72,7 @@ public class RoundRobinScheduler {
     }
 
     public static void main(String[] args) {
-        Log.printLine("Starting Round Robin Scheduler...");
+        Log.printLine("Starting SJF Scheduler...");
 
         new GenerateMatrices();
         execMatrix = GenerateMatrices.getExecMatrix();
@@ -92,7 +92,7 @@ public class RoundRobinScheduler {
             }
 
             //Third step: Create Broker
-            RoundRobinDatacenterBroker broker = createBroker("Broker_0");
+            SJFDatacenterBroker broker = createBroker("Broker_0");
             int brokerId = broker.getId();
 
             //Fourth step: Create VMs and Cloudlets and send them to broker
@@ -113,15 +113,15 @@ public class RoundRobinScheduler {
 
             printCloudletList(newList);
 
-            Log.printLine(RoundRobinScheduler.class.getName() + " finished!");
+            Log.printLine(SJF_Scheduler.class.getName() + " finished!");
         } catch (Exception e) {
             e.printStackTrace();
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
 
-    private static RoundRobinDatacenterBroker createBroker(String name) throws Exception {
-        return new RoundRobinDatacenterBroker(name);
+    private static SJFDatacenterBroker createBroker(String name) throws Exception {
+        return new SJFDatacenterBroker(name);
     }
 
     /**
@@ -160,7 +160,7 @@ public class RoundRobinScheduler {
             }
         }
         double makespan = calcMakespan(list);
-        Log.printLine("Makespan using RR: " + makespan);
+        Log.printLine("Makespan using SJF: " + makespan);
     }
 
     private static double calcMakespan(List<Cloudlet> list) {

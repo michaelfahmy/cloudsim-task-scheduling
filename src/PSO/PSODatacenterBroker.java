@@ -1,15 +1,13 @@
 package PSO;
 
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Vm;
+
+import org.cloudbus.cloudsim.*;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
+import org.cloudbus.cloudsim.core.SimEvent;
 import org.cloudbus.cloudsim.lists.VmList;
 
 import java.util.List;
-
 
 public class PSODatacenterBroker extends DatacenterBroker {
 
@@ -19,12 +17,16 @@ public class PSODatacenterBroker extends DatacenterBroker {
         super(name);
     }
 
-//    public void submitMapping(double[] mapping) {
-//        this.mapping = mapping;
-//    }
-
     public void setMapping(double[] mapping) {
         this.mapping = mapping;
+    }
+
+    private List<Cloudlet> assignCloudletsToVms(List<Cloudlet> cloudlist) {
+        int idx = 0;
+        for (Cloudlet cl : cloudlist) {
+            cl.setVmId((int) mapping[idx++]);
+        }
+        return cloudlist;
     }
 
     @Override
@@ -55,12 +57,34 @@ public class PSODatacenterBroker extends DatacenterBroker {
         }
     }
 
+    @Override
+    protected void processResourceCharacteristics(SimEvent ev) {
+        DatacenterCharacteristics characteristics = (DatacenterCharacteristics) ev.getData();
+        getDatacenterCharacteristicsList().put(characteristics.getId(), characteristics);
 
-    public List<Cloudlet> assignCloudletsToVms(List<Cloudlet> cloudlist) {
-        int idx = 0;
-        for (Cloudlet cl : cloudlist) {
-            cl.setVmId((int) mapping[idx++]);
+        if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList().size()) {
+            distributeRequestsForNewVmsAcrossDatacenters();
         }
-        return cloudlist;
+    }
+
+    protected void distributeRequestsForNewVmsAcrossDatacenters() {
+        int numberOfVmsAllocated = 0;
+        int i = 0;
+
+        final List<Integer> availableDatacenters = getDatacenterIdsList();
+
+        for (Vm vm : getVmList()) {
+            int datacenterId = availableDatacenters.get(i++ % availableDatacenters.size());
+            String datacenterName = CloudSim.getEntityName(datacenterId);
+
+            if (!getVmsToDatacentersMap().containsKey(vm.getId())) {
+                Log.printLine(CloudSim.clock() + ": " + getName() + ": Trying to Create VM #" + vm.getId() + " in " + datacenterName);
+                sendNow(datacenterId, CloudSimTags.VM_CREATE_ACK, vm);
+                numberOfVmsAllocated++;
+            }
+        }
+
+        setVmsRequested(numberOfVmsAllocated);
+        setVmsAcks(0);
     }
 }
