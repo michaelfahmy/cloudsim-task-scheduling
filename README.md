@@ -1,5 +1,5 @@
 # CloudSim Task Allocation and Scheduling
 
-* Round Robin Algorithm       `RoundRobin.RoundRobinScheduler`
 * Particle Swarm Optimization `PSO.PSO_Scheduler`
+* Round Robin Algorithm       `RoundRobin.RoundRobinScheduler`
 * Shortest Job First          `SJF.SJF_Scheduler`
